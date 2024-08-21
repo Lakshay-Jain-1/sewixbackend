@@ -3,7 +3,15 @@ import cors from "cors"
 import Stripe from "stripe"
 const app = express()
 const stripe = new Stripe("sk_test_51P4Re4SDWrf3hkbmcbj3TxgSZcLgKOEET2gfpFMIhNx2JDEIF3fFUu3PHyL3EDJ7mm3eUDi3Fs08RracAUja1uVT009uRygTal");
-app.use(cors())
+
+var corsOptions = {
+    origin: 'http://localhost:5173',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }
+   
+
+app.use(cors(corsOptions))
+app.use(express.json())
 
 app.post("/makepayment", async (req, res) => {
     const { total } = req.body;
@@ -14,18 +22,18 @@ app.post("/makepayment", async (req, res) => {
         line_items: [
           {
             price_data: {
-              currency: 'usd', // You can change this to the relevant currency
+              currency: 'inr', 
               product_data: {
                 name: 'Total Amount',
               },
-              unit_amount: total, // total should be in the smallest currency unit (e.g., cents for USD)
+              unit_amount: total*100, 
             },
             quantity: 1,
           },
         ],
         mode: "payment",
-        success_url: 'https://yourdomain.com/success', // Replace with your success URL
-        cancel_url: 'https://yourdomain.com/cancel', // Replace with your cancel URL
+        success_url: 'http://localhost:5173/success', 
+        cancel_url: 'http://localhost:5173/failed', 
       });
   
       res.send({ id: session.id });
@@ -35,9 +43,7 @@ app.post("/makepayment", async (req, res) => {
     }
   });
   
-app.get("/",(req,res)=>{
-    res.send("dashjsdjak")
-})
+
 
 
 
